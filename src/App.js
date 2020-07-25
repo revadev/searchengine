@@ -9,19 +9,23 @@ export default class App extends Component {
     super(props);
     this.state = {
       inputVal: "",
+      suggestionNumber: 3,
       suggestedrecords: [],
       selectedBooks: [],
     };
-    this.handleSuggestion = this.handleSuggestion.bind(this);
-    this.handleClick = this.handleClick.bind(this);
   }
-  handleSuggestion(e) {
+
+  handleNumChange = (e) => {
+    this.setState({ suggestionNumber: e.target.value });
+  };
+
+  handleSuggestion = (e) => {
     this.setState({ inputVal: e.target.value });
     let queryString = e.target.value,
       optionList,
       result;
     if (queryString.length > 3) {
-      result = fetchDataMatch(queryString, data);
+      result = fetchDataMatch(queryString, data, this.state.suggestionNumber,this.state.selectedBooks);
       if (result.length > 0) {
         optionList = (
           <div id='mylist' className='autocomplete-items'>
@@ -38,17 +42,15 @@ export default class App extends Component {
       }
       this.setState({ suggestedrecords: optionList });
     }
-  }
+  };
 
-  handleClick(option) {
+  handleClick = (option) => {
     this.setState({
       selectedBooks: [...this.state.selectedBooks, option],
       suggestedrecords: [],
       inputVal: "",
     });
-
-    console.log("handleClick" + option);
-  }
+  };
   render() {
     let { inputVal, selectedBooks } = this.state;
     return (
@@ -57,13 +59,16 @@ export default class App extends Component {
           <input
             id='myInput'
             type='text'
-            placeholder='Search Books here'
+            placeholder='Search and Add Books from here'
             value={inputVal}
             onChange={this.handleSuggestion}
           />
           {this.state.suggestedrecords}
         </div>
-        <input type='submit' onClick={this.handleClick}></input>
+        <input
+          type='number'
+          value={this.state.suggestionNumber}
+          onChange={this.handleNumChange} ></input>
         {selectedBooks.length > 0 && (
           <div className='container'>
             {selectedBooks.map((option, index) => (
